@@ -103,7 +103,7 @@ class MainFragment : Fragment() {
     */
     private fun requestCurrentWeatherData(city: String) {
         val url =
-            "https://api.weatherapi.com/v1/forecast.json?" + "key=$API_KEY" + "&q=$city&days=6&aqi=no&alerst=no"
+            "https://api.weatherapi.com/v1/forecast.json?" + "key=$API_KEY" + "&q=$city&days=5&aqi=no&alerst=no"
         val quene = Volley.newRequestQueue(context)
         val request = StringRequest(Request.Method.GET, url, { result ->
             parseWeatherData(result)
@@ -144,20 +144,21 @@ class MainFragment : Fragment() {
         checkPermission()
         init()
         updateCurrentCard()
-        checkLocationMessage()
+
 
     }
 
     private fun init() = with(binding) {
         clientLocation = LocationServices.getFusedLocationProviderClient(requireContext())
         val adapter = FragmentAdapter(activity as FragmentActivity, fragmentList)
+
         viewPager.adapter = adapter
         TabLayoutMediator(tabLayout, viewPager) { tab, pos ->
             tab.text = tabList[pos]
         }.attach()
         syncButton.setOnClickListener{
             tabLayout.selectTab(tabLayout.getTabAt(0))
-
+            checkLocationMessage()
         }
     }
 
@@ -218,13 +219,11 @@ class MainFragment : Fragment() {
 
     private fun updateCurrentCard() = with(binding) {
         dataModel.liveDataCurrent.observe(viewLifecycleOwner) {
-            val tempMaxMin = "${it.maxTempData}°С / ${it.minTempData}°С"
-           // val currentTemp = "${it.currentTempData}°С"
+            val tempMaxMin = "${it.maxTempData}°С / ${it.minTempData}"
             cityNameTextView.text = it.cityNameData
-            dateAndTimeTextView.text = it.dateAndTimeData
             currentTempTextView.text = it.currentTempData.ifEmpty {tempMaxMin}
             conditionStatusTextView.text = it.conditionStatusData
-            tempMaxMinTextView.text = if(it.currentTempData.isEmpty()) "" else tempMaxMin
+            tempMaxMinTextView.text = if(it.currentTempData.isEmpty()) "" else "${tempMaxMin}°С"
 
 
 

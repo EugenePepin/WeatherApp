@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:visibility="visible"
     tools:context=".fragment.MainFragment">
 
     <ImageView
@@ -40,18 +41,14 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/dateAndTimeTextView"
+                android:id="@+id/currentTempTextView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:text="01.01.1997 12:36"
+                android:text="°C"
                 android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toStartOf="@+id/cityNameTextView"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/cityNameTextView" />
+                android:textSize="56sp"
+                app:layout_constraintStart_toEndOf="@+id/currentTempTextView"
+                app:layout_constraintTop_toTopOf="@+id/currentTempTextView" />
 
             <ImageView
                 android:id="@+id/weatherImage"
@@ -59,13 +56,15 @@
                 android:layout_height="40dp"
                 android:src="@drawable/ic_launcher_foreground"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/cityNameTextView"
+                app:layout_constraintTop_toTopOf="@+id/cityNameTextView" />
 
             <TextView
                 android:id="@+id/cityNameTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="40dp"
                 android:text="Львів"
                 android:textColor="#FFFFFF"
                 android:textSize="24sp"
@@ -78,15 +77,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="36dp"
-                android:text="20°C"
+                android:text="20"
                 android:textColor="#FFFFFF"
                 android:textSize="56sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.484"
+                app:layout_constraintHorizontal_bias="0.397"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cityNameTextView"
-                app:layout_constraintVertical_bias="0.057" />
+                app:layout_constraintVertical_bias="0.107" />
 
             <TextView
                 android:id="@+id/conditionStatusTextView"
@@ -96,7 +95,7 @@
                 android:text="Sunny"
                 android:textColor="#FFFFFF"
                 android:textSize="24sp"
-                app:layout_constraintEnd_toEndOf="@+id/currentTempTextView"
+                app:layout_constraintEnd_toEndOf="@+id/currentTempTextView2"
                 app:layout_constraintStart_toStartOf="@+id/currentTempTextView"
                 app:layout_constraintTop_toBottomOf="@+id/currentTempTextView" />
 
@@ -147,12 +146,17 @@
         android:backgroundTint="#00FFFFFF"
         app:layout_constraintEnd_toEndOf="@+id/cardView"
         app:layout_constraintStart_toStartOf="@+id/cardView"
-        app:layout_constraintTop_toBottomOf="@+id/cardView">
+        app:layout_constraintTop_toBottomOf="@+id/cardView"
+        app:tabSelectedTextColor="#FFFFFF"
+        app:tabTextColor="#FFFFFF">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contextClickable="false"
             android:text="Hours" />
+
+        />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
@@ -160,6 +164,7 @@
             android:text="Days"
             tools:layout_editor_absoluteX="138dp"
             tools:layout_editor_absoluteY="-1dp" />
+        />
 
     </com.google.android.material.tabs.TabLayout>
 
