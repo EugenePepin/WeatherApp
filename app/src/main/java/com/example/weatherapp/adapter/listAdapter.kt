@@ -22,9 +22,11 @@ class listAdapter(val listener: Listener?) : ListAdapter<WeatherData, listAdapte
         }
         fun bind(item: WeatherData) = with(binding) {
             itemTemp = item
-            //val currentTemp = "${item.currentTempData}°С"
-            dateTextView.text = item.dateAndTimeData
-            tempTextView.text = item.currentTempData.ifEmpty{ "${item.maxTempData}°С / ${item.minTempData}°С"}
+
+            val dataTime = item.dateAndTimeData
+            val modTimeData = dataTime.substringAfter(" ").replace("-", "/")
+            dateTextView.text = modTimeData
+            tempTextView.text = item.currentTempData.ifEmpty{ "${item.maxTempData}°С / ${item.minTempData}"}
             conditionTextView.text = item.conditionStatusData
             Picasso.get().load("https:" + item.iconUrl).into(weatherIcon)
         }

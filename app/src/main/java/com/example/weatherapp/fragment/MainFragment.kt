@@ -1,5 +1,4 @@
 package com.example.weatherapp.fragment
-
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -16,7 +15,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import androidx.core.content.getSystemService
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import com.android.volley.Request
@@ -90,7 +88,7 @@ class MainFragment : Fragment() {
             getLocation()
         } else {
             DialogManager.locationDialog(requireContext(), object: DialogManager.Listener{
-                override fun onClick() {
+                override fun onClick(name: String?) {
                     startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                 }
             })
@@ -160,7 +158,19 @@ class MainFragment : Fragment() {
             tabLayout.selectTab(tabLayout.getTabAt(0))
             checkLocationMessage()
         }
-    }
+       searchButton.setOnClickListener {
+            DialogManager.searchByNameDialog(requireContext(), object : DialogManager.Listener{
+                override fun onClick(name: String?) {
+                    name?.let { it1 -> requestCurrentWeatherData(it1) }
+                }
+            })
+            }
+        }
+
+
+
+
+
 
 
 

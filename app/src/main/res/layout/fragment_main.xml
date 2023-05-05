@@ -40,16 +40,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/currentTempTextView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="°C"
-                android:textColor="#FFFFFF"
-                android:textSize="56sp"
-                app:layout_constraintStart_toEndOf="@+id/currentTempTextView"
-                app:layout_constraintTop_toTopOf="@+id/currentTempTextView" />
-
             <ImageView
                 android:id="@+id/weatherImage"
                 android:layout_width="40dp"
@@ -76,16 +66,28 @@
                 android:id="@+id/currentTempTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="36dp"
+                android:layout_marginTop="24dp"
                 android:text="20"
                 android:textColor="#FFFFFF"
-                android:textSize="56sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="64sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.397"
+                app:layout_constraintHorizontal_bias="0.378"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cityNameTextView"
-                app:layout_constraintVertical_bias="0.107" />
+                app:layout_constraintTop_toBottomOf="@+id/cityNameTextView" />
+
+            <TextView
+                android:id="@+id/currentTempTextView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="°C"
+                android:textColor="#FFFFFF"
+                android:textSize="64sp"
+                app:layout_constraintBottom_toBottomOf="@+id/currentTempTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/currentTempTextView"
+                app:layout_constraintTop_toTopOf="@+id/currentTempTextView"
+                app:layout_constraintVertical_bias="0.0" />
 
             <TextView
                 android:id="@+id/conditionStatusTextView"
@@ -95,8 +97,8 @@
                 android:text="Sunny"
                 android:textColor="#FFFFFF"
                 android:textSize="24sp"
-                app:layout_constraintEnd_toEndOf="@+id/currentTempTextView2"
-                app:layout_constraintStart_toStartOf="@+id/currentTempTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/currentTempTextView" />
 
             <TextView
@@ -106,7 +108,7 @@
                 android:layout_marginTop="5dp"
                 android:text="25"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp"
+                android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="@+id/conditionStatusTextView"
                 app:layout_constraintStart_toStartOf="@+id/conditionStatusTextView"
                 app:layout_constraintTop_toBottomOf="@+id/conditionStatusTextView" />
@@ -122,7 +124,7 @@
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <ImageButton
-                android:id="@+id/seatchButton"
+                android:id="@+id/searchButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#00FFFFFF"

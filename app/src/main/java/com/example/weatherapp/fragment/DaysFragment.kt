@@ -5,11 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.MainViewModel
-import com.example.weatherapp.R
 import com.example.weatherapp.WeatherData
 import com.example.weatherapp.adapter.listAdapter
 import com.example.weatherapp.databinding.FragmentDaysBinding
