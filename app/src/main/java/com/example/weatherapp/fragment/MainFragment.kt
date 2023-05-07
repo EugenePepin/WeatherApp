@@ -21,6 +21,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.weatherapp.DialogManager
+import com.example.weatherapp.DialogManager.incorrectCityName
 import com.example.weatherapp.MainViewModel
 import com.example.weatherapp.WeatherData
 import com.example.weatherapp.adapter.FragmentAdapter
@@ -106,7 +107,7 @@ class MainFragment : Fragment() {
         val request = StringRequest(Request.Method.GET, url, { result ->
             parseWeatherData(result)
         }, { error ->
-            Log.d("MyLog", "Error $error")
+            incorrectCityName(requireContext())
         }
 
         )

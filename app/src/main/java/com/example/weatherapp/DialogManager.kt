@@ -37,6 +37,17 @@ object DialogManager {
         }
         dialog.show()
     }
+    fun incorrectCityName(context: Context){
+        val builder = AlertDialog.Builder(context)
+        val dialog = builder.create()
+        dialog.setTitle("Error!")
+        dialog.setMessage("Incorrect city name. Try again...")
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK"){ _,_ ->
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
     interface Listener{
         fun onClick(name: String?)
     }
