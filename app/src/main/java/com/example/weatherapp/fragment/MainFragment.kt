@@ -6,11 +6,11 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,6 +38,64 @@ import org.json.JSONObject
 class MainFragment : Fragment() {
 
     private lateinit var clientLocation: FusedLocationProviderClient
+    private lateinit var pLauncher: ActivityResultLauncher<String>
+    private lateinit var binding: FragmentMainBinding
+    private val dataModel: MainViewModel by activityViewModels()
+    private val fragmentList = listOf(
+        HoursFragment.NewInstance(), DaysFragment.NewInstance()
+    )
+    private val tabList = listOf(
+        "Hours", "Days"
+    )
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+
+        binding = FragmentMainBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkLocationMessage()
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        super.onViewCreated(view, savedInstanceState)
+        checkPermission()
+        init()
+        updateCurrentCard()
+
+
+    }
+
+    private fun init() = with(binding) {
+        clientLocation = LocationServices.getFusedLocationProviderClient(requireContext())
+        val adapter = FragmentAdapter(activity as FragmentActivity, fragmentList)
+
+        viewPager.adapter = adapter
+        TabLayoutMediator(tabLayout, viewPager) { tab, pos ->
+            tab.text = tabList[pos]
+        }.attach()
+        syncButton.setOnClickListener{
+            tabLayout.selectTab(tabLayout.getTabAt(0))
+            checkLocationMessage()
+        }
+
+
+        editCityText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                val cityName =  editCityText.text.toString()
+                requestCurrentWeatherData(cityName)
+                editCityText.setText("")
+
+            }
+            true
+        }
+    }
+
     /*
     функції для перевірки доступу до місця розташування
     */
@@ -113,72 +171,27 @@ class MainFragment : Fragment() {
         )
         quene.add(request)
     }
-    //
-
-
-    private lateinit var pLauncher: ActivityResultLauncher<String>
-    private lateinit var binding: FragmentMainBinding
-    private val dataModel: MainViewModel by activityViewModels()
-    private val fragmentList = listOf(
-        HoursFragment.NewInstance(), DaysFragment.NewInstance()
-    )
-    private val tabList = listOf(
-        "Hours", "Days"
-    )
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-
-        binding = FragmentMainBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onResume() {
-        super.onResume()
-        checkLocationMessage()
-    }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        checkPermission()
-        init()
-        updateCurrentCard()
-
-
-    }
-
-    private fun init() = with(binding) {
-        clientLocation = LocationServices.getFusedLocationProviderClient(requireContext())
-        val adapter = FragmentAdapter(activity as FragmentActivity, fragmentList)
-
-        viewPager.adapter = adapter
-        TabLayoutMediator(tabLayout, viewPager) { tab, pos ->
-            tab.text = tabList[pos]
-        }.attach()
-        syncButton.setOnClickListener{
-            tabLayout.selectTab(tabLayout.getTabAt(0))
-            checkLocationMessage()
-        }
-       searchButton.setOnClickListener {
-            DialogManager.searchByNameDialog(requireContext(), object : DialogManager.Listener{
-                override fun onClick(name: String?) {
-                    name?.let { it1 -> requestCurrentWeatherData(it1) }
-                }
-            })
-            }
-        }
-
-
-
-
-
-
-
 
     private fun parseWeatherData(result: String) {
         val mainObject = JSONObject(result)
         val list = parseDays(mainObject)
         parseCurrentWeatherData(mainObject, list[0])
+    }
+
+    private fun parseCurrentWeatherData(mainObject: JSONObject, weatherTempItem: WeatherData) {
+
+
+        val item = WeatherData(
+            mainObject.getJSONObject("location").getString("name"),
+            mainObject.getJSONObject("current").getString("last_updated"),
+            mainObject.getJSONObject("current").getJSONObject("condition").getString("text"),
+            mainObject.getJSONObject("current").getString("temp_c").toFloat().toInt().toString(),
+            mainObject.getJSONObject("current").getJSONObject("condition").getString("icon"),
+            weatherTempItem.maxTempData,
+            weatherTempItem.minTempData,
+            weatherTempItem.hoursData
+        )
+        dataModel.liveDataCurrent.value = item
     }
 
     private fun parseDays(mainObject: JSONObject): List<WeatherData> {
@@ -207,22 +220,6 @@ class MainFragment : Fragment() {
     }
 
     //
-    private fun parseCurrentWeatherData(mainObject: JSONObject, weatherTempItem: WeatherData) {
-
-
-        val item = WeatherData(
-            mainObject.getJSONObject("location").getString("name"),
-            mainObject.getJSONObject("current").getString("last_updated"),
-            mainObject.getJSONObject("current").getJSONObject("condition").getString("text"),
-            mainObject.getJSONObject("current").getString("temp_c").toFloat().toInt().toString(),
-            mainObject.getJSONObject("current").getJSONObject("condition").getString("icon"),
-            weatherTempItem.maxTempData,
-            weatherTempItem.minTempData,
-            weatherTempItem.hoursData
-        )
-        dataModel.liveDataCurrent.value = item
-    }
-
 
     /*
      додаємо дані в TextView
@@ -252,6 +249,7 @@ class MainFragment : Fragment() {
 
     }
 }
+
 
 
 

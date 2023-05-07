@@ -38,7 +38,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:textAlignment="textStart">
 
             <ImageView
                 android:id="@+id/weatherImage"
@@ -123,29 +124,26 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <ImageButton
-                android:id="@+id/searchButton"
-                android:layout_width="wrap_content"
+            <EditText
+                android:hint="Search..."
+                android:id="@+id/editCityText"
+                android:layout_width="103dp"
                 android:layout_height="wrap_content"
-                android:background="#00FFFFFF"
-                android:backgroundTint="#00FFFFFF"
-                android:src="@drawable/search_13_32"
+                android:layout_marginStart="5dp"
+                android:layout_marginBottom="3dp"
+                android:background="@drawable/edit_city_text"
+                android:cursorVisible="false"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:paddingLeft="10sp"
+                android:textAlignment="textStart"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/tempMaxMinTextView"
+                app:layout_constraintEnd_toStartOf="@+id/syncButton"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tempMaxMinTextView"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <EditText
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="144dp"
-                android:text="TextView"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="@+id/tempMaxMinTextView" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
