@@ -175,10 +175,10 @@ class MainFragment : Fragment() {
 
     //зміна фону залежно від часу користувача
     private fun changeBackgroundFromTime() = with(binding) {
-        var currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        if (currentHour == 18 && currentHour != 6) {
+        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        if (currentHour in 18..23 || currentHour in 0..6) {
             imageView.setImageResource(R.drawable.night_background)
-        } else if (currentHour == 6 && currentHour != 18) {
+        } else if (currentHour in 7..17) {
             imageView.setImageResource(R.drawable.day_background)
         }
 
