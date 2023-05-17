@@ -9,15 +9,17 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.MainViewModel
 import com.example.weatherapp.WeatherData
-import com.example.weatherapp.adapter.listAdapter
+import com.example.weatherapp.adapter.ListenerAdapter
 import com.example.weatherapp.databinding.FragmentHoursBinding
 import org.json.JSONArray
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Calendar
 
 
 class HoursFragment : Fragment() {
     private lateinit var binding: FragmentHoursBinding
-    private lateinit var adapter: listAdapter
+    private lateinit var adapter: ListenerAdapter
     private val model: MainViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,21 +33,55 @@ class HoursFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
-        model.liveDataCurrent.observe(viewLifecycleOwner){
+        model.liveDataCurrent.observe(viewLifecycleOwner) {
             adapter.submitList(getHoursList(it))
         }
     }
-    private fun initRecyclerView() = with(binding){
+
+    private fun initRecyclerView() = with(binding) {
         hoursRecyclerView.layoutManager = LinearLayoutManager(activity)
-        adapter = listAdapter(null)
+        adapter = ListenerAdapter(null)
         hoursRecyclerView.adapter = adapter
 
     }
 
-    private fun getHoursList(weatherItem: WeatherData): List<WeatherData>{
+    private val dataModel: MainViewModel by activityViewModels()
+
+    //перевірка, чи потрібно змінювати кількість элементів hour, залежно від вибраного дня
+    private fun checkIndexList(): Int {
+        var startIndex = 0
+        val currentData = dataModel.liveDataCurrent.value
+
+        if (currentData != null) {
+            val modDateAndTimeParts =
+                currentData.dateAndTimeData.substringBefore(" ").replace("-", "/").split("/")
+            val inputDateString = modDateAndTimeParts.reversed().joinToString("/")
+
+            val inputDateFormat = SimpleDateFormat("dd/mm/yyyy")
+            val inputDate = inputDateFormat.parse(inputDateString)
+            val outputDateFormat = SimpleDateFormat("dd")
+            val outputDate = outputDateFormat.format(inputDate).toInt()
+
+            val calendar = Calendar.getInstance()
+            val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+
+
+            if (dayOfMonth != outputDate) {
+                startIndex = 0
+            } else {
+                startIndex = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1
+            }
+        }
+        return startIndex
+    }
+
+
+    //заповнення вкладки "Hours"
+    private fun getHoursList(weatherItem: WeatherData): List<WeatherData> {
         val hoursArray = JSONArray(weatherItem.hoursData)
         val list = ArrayList<WeatherData>()
-        for (i in 0 until hoursArray.length()){
+        val startIndex = checkIndexList()
+        for (i in startIndex until hoursArray.length()) {
             val item = WeatherData(
                 weatherItem.cityNameData,
                 (hoursArray[i] as JSONObject).getString("time"),
@@ -60,6 +96,8 @@ class HoursFragment : Fragment() {
         }
         return list
     }
+
+
     companion object {
 
         @JvmStatic

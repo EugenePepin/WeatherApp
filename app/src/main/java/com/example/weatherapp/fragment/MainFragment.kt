@@ -1,4 +1,5 @@
 package com.example.weatherapp.fragment
+
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -6,23 +7,29 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
+import com.android.volley.ClientError
+import com.android.volley.NoConnectionError
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.weatherapp.DialogManager
 import com.example.weatherapp.DialogManager.incorrectCityName
+import com.example.weatherapp.DialogManager.noConnection
 import com.example.weatherapp.MainViewModel
+import com.example.weatherapp.R
 import com.example.weatherapp.WeatherData
 import com.example.weatherapp.adapter.FragmentAdapter
 import com.example.weatherapp.databinding.FragmentMainBinding
@@ -33,6 +40,7 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
+import java.util.Calendar
 
 
 class MainFragment : Fragment() {
@@ -60,13 +68,16 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         checkLocationMessage()
+        changeBackgroundFromTime()
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
         init()
         updateCurrentCard()
+        changeBackgroundFromTime()
 
 
     }
@@ -79,26 +90,31 @@ class MainFragment : Fragment() {
         TabLayoutMediator(tabLayout, viewPager) { tab, pos ->
             tab.text = tabList[pos]
         }.attach()
-        syncButton.setOnClickListener{
+        //функіонал для кнопки синхронізації
+        syncButton.setOnClickListener {
             tabLayout.selectTab(tabLayout.getTabAt(0))
             checkLocationMessage()
         }
 
-
-        editCityText.setOnEditorActionListener { v, actionId, event ->
+        //функіонал для поля з текстом
+        editCityText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val cityName =  editCityText.text.toString()
+                val cityName = editCityText.text.toString()
                 requestCurrentWeatherData(cityName)
                 editCityText.setText("")
+
+                val inputMethodManager =
+                    requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(editCityText.windowToken, 0)
 
             }
             true
         }
     }
 
-    /*
-    функції для перевірки доступу до місця розташування
-    */
+
+    //функції для перевірки доступу до місця розташування
+
     private fun checkPermission() {
         if (!permissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
             permissionListener()
@@ -112,8 +128,8 @@ class MainFragment : Fragment() {
             Toast.makeText(activity, "Permission is $it", Toast.LENGTH_LONG).show()
         }
     }
-    //
 
+    //додаємо місто з місця розташування
     private fun getLocation() {
 
         val ct = CancellationTokenSource()
@@ -135,18 +151,20 @@ class MainFragment : Fragment() {
 
     }
 
-    private fun isLocationEnabled(): Boolean{
+    //перевірка, чи включена функція місця розташування
+    private fun isLocationEnabled(): Boolean {
 
-         val lm = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val lm = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
 
     }
 
-    private fun checkLocationMessage(){
-        if(isLocationEnabled()){
+    //виведення AlertDialog при вимкненому розташуванні, і перекидування до налаштувань
+    private fun checkLocationMessage() {
+        if (isLocationEnabled()) {
             getLocation()
         } else {
-            DialogManager.locationDialog(requireContext(), object: DialogManager.Listener{
+            DialogManager.locationDialog(requireContext(), object : DialogManager.Listener {
                 override fun onClick(name: String?) {
                     startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                 }
@@ -155,20 +173,41 @@ class MainFragment : Fragment() {
 
     }
 
-    /*
-   витягаємо дані з WeatherAPI
-    */
+    //зміна фону залежно від часу користувача
+    private fun changeBackgroundFromTime() = with(binding) {
+        var currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        if (currentHour == 18 && currentHour != 6) {
+            imageView.setImageResource(R.drawable.night_background)
+        } else if (currentHour == 6 && currentHour != 18) {
+            imageView.setImageResource(R.drawable.day_background)
+        }
+
+    }
+
+
+    //робимо запит до WeatherAPI
+
     private fun requestCurrentWeatherData(city: String) {
         val url =
-            "https://api.weatherapi.com/v1/forecast.json?" + "key=$API_KEY" + "&q=$city&days=5&aqi=no&alerst=no"
+            "https://api.weatherapi.com/v1/forecast.json?key=$API_KEY&q=$city&days=5&aqi=no&alerst=no"
         val quene = Volley.newRequestQueue(context)
         val request = StringRequest(Request.Method.GET, url, { result ->
             parseWeatherData(result)
         }, { error ->
-            incorrectCityName(requireContext())
-        }
+            when (error) {
+                is NoConnectionError -> {
+                    noConnection(requireContext())
+                }
 
-        )
+                is ClientError -> {
+                    incorrectCityName(requireContext())
+                }
+
+                else -> {
+                    Log.d("VolleyError", "Volley error is: $error")
+                }
+            }
+        })
         quene.add(request)
     }
 
@@ -178,6 +217,7 @@ class MainFragment : Fragment() {
         parseCurrentWeatherData(mainObject, list[0])
     }
 
+    //витягаємо дані до картки з актуальною погодою
     private fun parseCurrentWeatherData(mainObject: JSONObject, weatherTempItem: WeatherData) {
 
 
@@ -194,12 +234,14 @@ class MainFragment : Fragment() {
         dataModel.liveDataCurrent.value = item
     }
 
+
+    //витягаємо дані для днів
     private fun parseDays(mainObject: JSONObject): List<WeatherData> {
         val list = ArrayList<WeatherData>()
         val daysArray = mainObject.getJSONObject("forecast")
             .getJSONArray("forecastday")
-        val name =  mainObject.getJSONObject("location").getString("name")
-        for (i in 0 until daysArray.length()){
+        val name = mainObject.getJSONObject("location").getString("name")
+        for (i in 0 until daysArray.length()) {
             val day = daysArray[i] as JSONObject
             val item = WeatherData(
                 name,
@@ -219,19 +261,21 @@ class MainFragment : Fragment() {
         return list
     }
 
-    //
 
-    /*
-     додаємо дані в TextView
-    */
+    //додаємо дані до картки з актуальною погодою
+
 
     private fun updateCurrentCard() = with(binding) {
         dataModel.liveDataCurrent.observe(viewLifecycleOwner) {
-            val tempMaxMin = "${it.maxTempData}°С / ${it.minTempData}"
+            val modDateAndTimeParts =
+                it.dateAndTimeData.substringBefore(" ").replace("-", "/").split("/")
+            val modDateAndTime = modDateAndTimeParts.reversed().joinToString("/")
+            dateAndTimeTextView.text = modDateAndTime
+            val tempMaxMin = "${it.maxTempData}°С /${it.minTempData}"
             cityNameTextView.text = it.cityNameData
-            currentTempTextView.text = it.currentTempData.ifEmpty {tempMaxMin}
+            currentTempTextView.text = it.currentTempData.ifEmpty { tempMaxMin } + "°C"
             conditionStatusTextView.text = it.conditionStatusData
-            tempMaxMinTextView.text = if(it.currentTempData.isEmpty()) "" else "${tempMaxMin}°С"
+            tempMaxMinTextView.text = if (it.currentTempData.isEmpty()) "" else "$tempMaxMin°C"
 
 
 
@@ -245,6 +289,8 @@ class MainFragment : Fragment() {
 
         @JvmStatic
         fun newInstance() = MainFragment()
+
+        //ключ до мого WeatherApi
         const val API_KEY = "d106cfd856664bce921174757231304"
 
     }
