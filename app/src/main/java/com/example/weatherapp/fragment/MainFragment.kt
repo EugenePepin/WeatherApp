@@ -40,11 +40,12 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
+import java.text.SimpleDateFormat
 import java.util.Calendar
 
 
 class MainFragment : Fragment() {
-
+    private lateinit var lastUpdated: String
     private lateinit var clientLocation: FusedLocationProviderClient
     private lateinit var pLauncher: ActivityResultLauncher<String>
     private lateinit var binding: FragmentMainBinding
@@ -68,7 +69,7 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         checkLocationMessage()
-        changeBackgroundFromTime()
+        changeBackgroundFromTimeFromStart()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,7 +78,7 @@ class MainFragment : Fragment() {
         checkPermission()
         init()
         updateCurrentCard()
-        changeBackgroundFromTime()
+        changeBackgroundFromTimeFromStart()
 
 
     }
@@ -101,6 +102,7 @@ class MainFragment : Fragment() {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val cityName = editCityText.text.toString()
                 requestCurrentWeatherData(cityName)
+                changeBackgroundFromTime()
                 editCityText.setText("")
 
                 val inputMethodManager =
@@ -111,6 +113,7 @@ class MainFragment : Fragment() {
             true
         }
     }
+
 
 
     //функції для перевірки доступу до місця розташування
@@ -128,6 +131,7 @@ class MainFragment : Fragment() {
             Toast.makeText(activity, "Permission is $it", Toast.LENGTH_LONG).show()
         }
     }
+
 
     //додаємо місто з місця розташування
     private fun getLocation() {
@@ -174,7 +178,7 @@ class MainFragment : Fragment() {
     }
 
     //зміна фону залежно від часу користувача
-    private fun changeBackgroundFromTime() = with(binding) {
+    private fun changeBackgroundFromTimeFromStart() = with(binding) {
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         if (currentHour in 18..23 || currentHour in 0..6) {
             imageView.setImageResource(R.drawable.night_background)
@@ -182,6 +186,23 @@ class MainFragment : Fragment() {
             imageView.setImageResource(R.drawable.day_background)
         }
 
+    }
+
+    //зміна часу залежно від часу сервера (для пошуку)
+    private fun changeBackgroundFromTime() = with(binding) {
+        dataModel.liveDataCurrent.observe(viewLifecycleOwner) {
+
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
+            val outputFormat = SimpleDateFormat("HH")
+            val date = inputFormat.parse(lastUpdated)
+            val currentHour = outputFormat.format(date).toInt()
+            Log.d("VolleyError", "Volley error is: $currentHour")
+            if (currentHour in 18..23 || currentHour in 0..6) {
+                imageView.setImageResource(R.drawable.night_background)
+            } else if (currentHour in 7..17) {
+                imageView.setImageResource(R.drawable.day_background)
+            }
+        }
     }
 
 
@@ -220,7 +241,7 @@ class MainFragment : Fragment() {
     //витягаємо дані до картки з актуальною погодою
     private fun parseCurrentWeatherData(mainObject: JSONObject, weatherTempItem: WeatherData) {
 
-
+        lastUpdated = mainObject.getJSONObject("current").getString("last_updated")
         val item = WeatherData(
             mainObject.getJSONObject("location").getString("name"),
             mainObject.getJSONObject("current").getString("last_updated"),
@@ -233,7 +254,6 @@ class MainFragment : Fragment() {
         )
         dataModel.liveDataCurrent.value = item
     }
-
 
     //витягаємо дані для днів
     private fun parseDays(mainObject: JSONObject): List<WeatherData> {
@@ -267,15 +287,19 @@ class MainFragment : Fragment() {
 
     private fun updateCurrentCard() = with(binding) {
         dataModel.liveDataCurrent.observe(viewLifecycleOwner) {
-            val modDateAndTimeParts =
-                it.dateAndTimeData.substringBefore(" ").replace("-", "/").split("/")
-            val modDateAndTime = modDateAndTimeParts.reversed().joinToString("/")
-            dateAndTimeTextView.text = modDateAndTime
+            dateAndTimeTextView.text =
+                it.dateAndTimeData.substringBefore(" ").replace("-", "/").split("/").reversed()
+                    .joinToString("/")
             val tempMaxMin = "${it.maxTempData}°С /${it.minTempData}"
-            cityNameTextView.text = it.cityNameData
+            cityNameTextView.text =
+                String(it.cityNameData.toByteArray(Charsets.ISO_8859_1), Charsets.UTF_8)
             currentTempTextView.text = it.currentTempData.ifEmpty { tempMaxMin } + "°C"
             conditionStatusTextView.text = it.conditionStatusData
             tempMaxMinTextView.text = if (it.currentTempData.isEmpty()) "" else "$tempMaxMin°C"
+            //при пустому полі tempMaxMin - переводить до вкладки hours
+            if (tempMaxMinTextView.text.isEmpty()) {
+                tabLayout.selectTab(tabLayout.getTabAt(0))
+            }
 
 
 

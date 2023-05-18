@@ -55,7 +55,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
-                android:text="Chernivtsi"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +66,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:text="17/07/2022"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 app:layout_constraintBottom_toBottomOf="@+id/cityNameTextView"
@@ -79,7 +77,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:text="13"
                 android:textColor="#FFFFFF"
                 android:textSize="70sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -92,7 +89,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Sunny"
                 android:textColor="#FFFFFF"
                 android:textSize="26sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -105,7 +101,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="5dp"
-                android:text="20"
                 android:textColor="#FFFFFF"
                 android:textSize="28sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -154,18 +149,31 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:animateLayoutChanges="false"
         android:backgroundTint="#00FFFFFF"
+        android:persistentDrawingCache="animation"
         app:layout_constraintEnd_toEndOf="@+id/cardView"
         app:layout_constraintStart_toStartOf="@+id/cardView"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
+        app:tabGravity="fill"
+        app:tabIndicatorAnimationMode="linear"
+        app:tabIndicatorFullWidth="true"
+        app:tabIndicatorGravity="bottom"
+        app:tabMode="fixed"
         app:tabSelectedTextColor="#FFFFFF"
-        app:tabTextColor="#FFFFFF">
+        app:tabTextColor="#FFFFFF"
+        app:tabRippleColor="@null">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contextClickable="false"
-            android:text="Hours" />
+
+
+
+            android:text="Hours"
+            tools:layout_editor_absoluteX="-16dp"
+            tools:layout_editor_absoluteY="281dp" />
 
         />
 

@@ -23,13 +23,12 @@ class ListenerAdapter(val listener: Listener?) :
             }
         }
 
-        //заповнення данних для вкладки "Days"
+        //заповнення данних для вкладки "Hours"
         fun bind(item: WeatherData) = with(binding) {
             itemTemp = item
-            val modDateAndTimeParts =
-                item.dateAndTimeData.substringAfter(" ").replace("-", "/").split("/")
-            val modTimeData = modDateAndTimeParts.reversed().joinToString("/")
-            dateTextView.text = modTimeData
+            dateTextView.text =
+                item.dateAndTimeData.substringAfter(" ").replace("-", "/").split("/").reversed()
+                    .joinToString("/")
             tempTextView.text =
                 item.currentTempData.ifEmpty { "${item.maxTempData}°С / ${item.minTempData}" } + "°C"
             conditionTextView.text = item.conditionStatusData

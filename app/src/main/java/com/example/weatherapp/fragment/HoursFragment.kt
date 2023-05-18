@@ -53,12 +53,12 @@ class HoursFragment : Fragment() {
         val currentData = dataModel.liveDataCurrent.value
 
         if (currentData != null) {
-            val modDateAndTimeParts =
-                currentData.dateAndTimeData.substringBefore(" ").replace("-", "/").split("/")
-            val inputDateString = modDateAndTimeParts.reversed().joinToString("/")
 
             val inputDateFormat = SimpleDateFormat("dd/mm/yyyy")
-            val inputDate = inputDateFormat.parse(inputDateString)
+            val inputDate = inputDateFormat.parse(
+                currentData.dateAndTimeData.substringBefore(" ").replace("-", "/")
+                    .split("/").reversed().joinToString("/")
+            )
             val outputDateFormat = SimpleDateFormat("dd")
             val outputDate = outputDateFormat.format(inputDate).toInt()
 
