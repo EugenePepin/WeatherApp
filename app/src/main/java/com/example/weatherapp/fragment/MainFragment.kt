@@ -300,9 +300,6 @@ class MainFragment : Fragment() {
             if (tempMaxMinTextView.text.isEmpty()) {
                 tabLayout.selectTab(tabLayout.getTabAt(0))
             }
-
-
-
             Picasso.get().load("https:" + it.iconUrl).into(weatherImage)
         }
 
