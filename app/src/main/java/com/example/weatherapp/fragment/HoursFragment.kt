@@ -18,6 +18,7 @@ import java.util.Calendar
 
 
 class HoursFragment : Fragment() {
+    private val sharedViewModel: MainFragment.SharedViewModel by activityViewModels()
     private lateinit var binding: FragmentHoursBinding
     private lateinit var adapter: ListenerAdapter
     private val model: MainViewModel by activityViewModels()
@@ -50,6 +51,7 @@ class HoursFragment : Fragment() {
     //перевірка, чи потрібно змінювати кількість элементів hour, залежно від вибраного дня
     private fun checkIndexList(): Int {
         var startIndex = 0
+        val lastUpdated = sharedViewModel.lastUpdated
         val currentData = dataModel.liveDataCurrent.value
 
         if (currentData != null) {
@@ -65,11 +67,15 @@ class HoursFragment : Fragment() {
             val calendar = Calendar.getInstance()
             val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
 
+            val inputFormatHour = SimpleDateFormat("yyyy-MM-dd HH:mm")
+            val outputFormatHour = SimpleDateFormat("HH")
+            val date = inputFormatHour.parse(lastUpdated)
+            val currentHour = outputFormatHour.format(date).toInt()
 
             if (dayOfMonth != outputDate) {
                 startIndex = 0
             } else {
-                startIndex = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 1
+                startIndex = currentHour + 1
             }
         }
         return startIndex

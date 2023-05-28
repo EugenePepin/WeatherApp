@@ -20,6 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModel
 import com.android.volley.ClientError
 import com.android.volley.NoConnectionError
 import com.android.volley.Request
@@ -242,6 +243,7 @@ class MainFragment : Fragment() {
     private fun parseCurrentWeatherData(mainObject: JSONObject, weatherTempItem: WeatherData) {
 
         lastUpdated = mainObject.getJSONObject("current").getString("last_updated")
+        sharedViewModel.lastUpdated = lastUpdated
         val item = WeatherData(
             mainObject.getJSONObject("location").getString("name"),
             mainObject.getJSONObject("current").getString("last_updated"),
@@ -253,6 +255,11 @@ class MainFragment : Fragment() {
             weatherTempItem.hoursData
         )
         dataModel.liveDataCurrent.value = item
+    }
+
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+    class SharedViewModel : ViewModel() {
+        var lastUpdated: String = ""
     }
 
     //витягаємо дані для днів

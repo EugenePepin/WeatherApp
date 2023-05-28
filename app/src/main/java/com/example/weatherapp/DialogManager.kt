@@ -55,4 +55,5 @@ object DialogManager {
     interface Listener {
         fun onClick(name: String?)
     }
+
 }

@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         //костиль для автоматичного закриття клавіатури при згортанні/розгортанні
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+
         // передаємо фрагмент в MainActivity (MainActivity пустий)
         supportFragmentManager.beginTransaction()
             .replace(R.id.placeHolder, MainFragment.newInstance()).commit()
